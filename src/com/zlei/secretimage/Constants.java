@@ -3,6 +3,7 @@ package com.zlei.secretimage;
 public final class Constants {
 
     public static final String[] IMAGES = new String[] {
+            "assets://nature_1.jpg",
             "file://mnt/sdcard/DCIM/100ANDRO/DSC_0533.jpg",
             // Heavy images
             "https://lh6.googleusercontent.com/-55osAWw3x0Q/URquUtcFr5I/AAAAAAAAAbs/rWlj1RUKrYI/s1024/A%252520Photographer.jpg",

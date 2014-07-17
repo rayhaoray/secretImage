@@ -28,13 +28,14 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    private void getImagePath(){
+    private void getImagePath() {
         String path = Environment.getExternalStorageDirectory().toString();
-        String[] projection = { MediaStore.Images.Media.DATA }; 
-        for(String str: projection){
+        String[] projection = { MediaStore.Images.Media.DATA };
+        for (String str : projection) {
             Log.d("path: ", str + "\n");
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
