@@ -1,10 +1,17 @@
 package com.zlei.secretimage;
 
+import static com.zlei.secretimage.Constants.IMAGES;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.zlei.secretimage.Constants.Extra;
 
 public class MainActivity extends Activity {
 
@@ -12,8 +19,26 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.getImagePath();
     }
 
+    public void onStartClick(View view) {
+        Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra(Extra.IMAGES, IMAGES);
+        startActivity(intent);
+    }
+
+    private void getImagePath(){
+        String path = Environment.getExternalStorageDirectory().toString();
+        String[] projection = { MediaStore.Images.Media.DATA }; 
+        for(String str: projection){
+            Log.d("path: ", str + "\n");
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
