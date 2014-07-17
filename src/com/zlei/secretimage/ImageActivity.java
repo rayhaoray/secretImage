@@ -3,6 +3,7 @@ package com.zlei.secretimage;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -26,11 +28,25 @@ public class ImageActivity extends Activity {
 
     private static final String STATE_POSITION = "STATE_POSITION";
 
+    private int mInterval = 5000;
+
+    private Handler handler;
+
     private TouchImageView imageView;
 
-    DisplayImageOptions options;
+    private TextView timer;
 
-    ViewPager pager;
+    private DisplayImageOptions options;
+
+    private ViewPager pager;
+
+    private float zoomTimes;
+
+    private float xCoor;
+
+    private float yCoor;
+
+    private static final float ZOOMMAX = 12;
 
     protected ImageLoader imageLoader = ImageLoader.getInstance();
 
@@ -40,7 +56,7 @@ public class ImageActivity extends Activity {
         setContentView(R.layout.ac_image_pager);
 
         imageLoader.init(ImageLoaderConfiguration.createDefault(this));
-
+        handler = new Handler();
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
         if (bundle != null) {
@@ -52,16 +68,22 @@ public class ImageActivity extends Activity {
             pagerPosition = savedInstanceState.getInt(STATE_POSITION);
         }
 
+        // randomly generate the initial position
+        xCoor = (float) Math.random();
+        yCoor = (float) Math.random();
+        zoomTimes = ZOOMMAX;
+
         options =
                 new DisplayImageOptions.Builder().resetViewBeforeLoading(true).cacheOnDisk(
                         true).imageScaleType(
-                        ImageScaleType.IN_SAMPLE_POWER_OF_2).bitmapConfig(
+                        ImageScaleType.EXACTLY).bitmapConfig(
                         Bitmap.Config.RGB_565).considerExifParams(true).displayer(
                         new FadeInBitmapDisplayer(300)).build();
 
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new ImagePagerAdapter(imageUrls));
         pager.setCurrentItem(pagerPosition);
+        this.startRepeatingTask();
     }
 
     @Override
@@ -99,11 +121,11 @@ public class ImageActivity extends Activity {
         public Object instantiateItem(ViewGroup view, int position) {
             View imageLayout =
                     inflater.inflate(R.layout.item_pager_image, view, false);
-            assert imageLayout != null;
             imageView =
                     (TouchImageView) imageLayout.findViewById(R.id.img);
             final ProgressBar spinner =
                     (ProgressBar) imageLayout.findViewById(R.id.loading);
+            timer = (TextView) imageLayout.findViewById(R.id.count_down);
 
             imageLoader.displayImage(images[position], imageView, options,
                     new SimpleImageLoadingListener() {
@@ -146,6 +168,11 @@ public class ImageActivity extends Activity {
 
             view.addView(imageLayout, 0);
 
+            imageView.setMaxZoom(ZOOMMAX);
+            if (zoomTimes > 3)
+                imageView.setZoom(zoomTimes, xCoor, yCoor);
+            else
+                imageView.resetZoom();
             return imageLayout;
         }
 
@@ -161,6 +188,36 @@ public class ImageActivity extends Activity {
         @Override
         public Parcelable saveState() {
             return null;
+        }
+    }
+
+    // repeat task
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            updateImage(); // this function can change value of mInterval.
+            handler.postDelayed(mStatusChecker, mInterval);
+        }
+    };
+
+    private void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    private void stopRepeatingTask() {
+        handler.removeCallbacks(mStatusChecker);
+        mStatusChecker = null;
+    }
+
+    private void updateImage() {
+        if (zoomTimes > 1) {
+            if (zoomTimes > 2) {
+                zoomTimes -= 1;
+            }
+            else {
+                stopRepeatingTask();
+            }
+            pager.setAdapter(pager.getAdapter());
         }
     }
 }

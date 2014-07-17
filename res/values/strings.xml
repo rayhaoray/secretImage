@@ -6,5 +6,6 @@
     <string name="button_start">Start</string>
     <string name="action_settings">Settings</string>
     <string name="descr_image">Image</string>
+    <string name="count_down">Time</string>
 
 </resources>

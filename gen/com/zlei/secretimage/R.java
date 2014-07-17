@@ -31,9 +31,10 @@ public final class R {
         public static final int nature_5=0x7f020006;
     }
     public static final class id {
-        public static final int action_settings=0x7f08000b;
+        public static final int action_settings=0x7f08000c;
         public static final int bottomImage=0x7f080003;
         public static final int button_start=0x7f080001;
+        public static final int count_down=0x7f08000b;
         public static final int current_zoom=0x7f080008;
         public static final int img=0x7f080004;
         public static final int loading=0x7f08000a;
@@ -61,6 +62,7 @@ public final class R {
         public static final int action_settings=0x7f040010;
         public static final int app_name=0x7f040001;
         public static final int button_start=0x7f04000f;
+        public static final int count_down=0x7f040012;
         public static final int descr_image=0x7f040011;
         public static final int get_current_zoom=0x7f040009;
         public static final int get_scroll_position=0x7f040007;
