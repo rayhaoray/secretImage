@@ -1,6 +1,10 @@
 package com.zlei.secretimage;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -28,13 +31,11 @@ public class ImageActivity extends Activity {
 
     private static final String STATE_POSITION = "STATE_POSITION";
 
-    private int mInterval = 5000;
+    private int mInterval = 2000;
 
     private Handler handler;
 
     private TouchImageView imageView;
-
-    private TextView timer;
 
     private DisplayImageOptions options;
 
@@ -46,7 +47,11 @@ public class ImageActivity extends Activity {
 
     private float yCoor;
 
-    private static final float ZOOMMAX = 12;
+    private static final float ZOOMMAX = 8;
+
+    private int pagerPosition;
+
+    private Runnable mStatusChecker;
 
     protected ImageLoader imageLoader = ImageLoader.getInstance();
 
@@ -54,15 +59,22 @@ public class ImageActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_image_pager);
-
-        imageLoader.init(ImageLoaderConfiguration.createDefault(this));
+        if (!imageLoader.isInited()) {
+            imageLoader.init(ImageLoaderConfiguration.createDefault(this));
+        }
         handler = new Handler();
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
+        ArrayList<String> imagesUri = new ArrayList<String>();
         if (bundle != null) {
             imageUrls = bundle.getStringArray(Extra.IMAGES);
         }
-        int pagerPosition = bundle.getInt(Extra.IMAGE_POSITION, 0);
+
+        // int pagerPosition = bundle.getInt(Extra.IMAGE_POSITION, 0);
+        for (String uri : imageUrls) {
+            imagesUri.add(uri);
+        }
+        pagerPosition = 0;
 
         if (savedInstanceState != null) {
             pagerPosition = savedInstanceState.getInt(STATE_POSITION);
@@ -81,9 +93,9 @@ public class ImageActivity extends Activity {
                         new FadeInBitmapDisplayer(300)).build();
 
         pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new ImagePagerAdapter(imageUrls));
-        pager.setCurrentItem(pagerPosition);
-        this.startRepeatingTask();
+        pager.setAdapter(new ImagePagerAdapter(imagesUri));
+        // pager.setCurrentItem(pagerPosition);
+        startRepeatingTask();
     }
 
     @Override
@@ -93,17 +105,18 @@ public class ImageActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        stopRepeatingTask();
         imageLoader.stop();
         super.onBackPressed();
     }
 
     private class ImagePagerAdapter extends PagerAdapter {
 
-        private String[] images;
+        private ArrayList<String> imagesUri;
         private LayoutInflater inflater;
 
-        ImagePagerAdapter(String[] images) {
-            this.images = images;
+        ImagePagerAdapter(ArrayList<String> imagesUri) {
+            this.imagesUri = imagesUri;
             inflater = getLayoutInflater();
         }
 
@@ -114,7 +127,7 @@ public class ImageActivity extends Activity {
 
         @Override
         public int getCount() {
-            return images.length;
+            return imagesUri.size();
         }
 
         @Override
@@ -125,9 +138,9 @@ public class ImageActivity extends Activity {
                     (TouchImageView) imageLayout.findViewById(R.id.img);
             final ProgressBar spinner =
                     (ProgressBar) imageLayout.findViewById(R.id.loading);
-            timer = (TextView) imageLayout.findViewById(R.id.count_down);
 
-            imageLoader.displayImage(images[position], imageView, options,
+            imageLoader.displayImage(imagesUri.get(pagerPosition), imageView,
+                    options,
                     new SimpleImageLoadingListener() {
                         @Override
                         public void onLoadingStarted(String imageUri, View view) {
@@ -192,15 +205,15 @@ public class ImageActivity extends Activity {
     }
 
     // repeat task
-    Runnable mStatusChecker = new Runnable() {
-        @Override
-        public void run() {
-            updateImage(); // this function can change value of mInterval.
-            handler.postDelayed(mStatusChecker, mInterval);
-        }
-    };
 
     private void startRepeatingTask() {
+        mStatusChecker = new Runnable() {
+            @Override
+            public void run() {
+                updateImage(); // this function can change value of mInterval.
+                handler.postDelayed(mStatusChecker, mInterval);
+            }
+        };
         mStatusChecker.run();
     }
 
@@ -210,14 +223,38 @@ public class ImageActivity extends Activity {
     }
 
     private void updateImage() {
-        if (zoomTimes > 1) {
-            if (zoomTimes > 2) {
+        if (zoomTimes > 2) {
+            if (zoomTimes > 3) {
                 zoomTimes -= 1;
+                pager.setAdapter(pager.getAdapter());
             }
             else {
                 stopRepeatingTask();
+                new AlertDialog.Builder(ImageActivity.this).setMessage(
+                        "Time's Up!").setPositiveButton(
+                        "Next",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                pagerPosition++;
+                                // reset for get new image
+                                zoomTimes = ZOOMMAX;
+                                startRepeatingTask();
+                            }
+                        }).setNegativeButton("Exit",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                imageLoader.stop();
+                                finish();
+                            }
+                        }).show();
             }
-            pager.setAdapter(pager.getAdapter());
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }
