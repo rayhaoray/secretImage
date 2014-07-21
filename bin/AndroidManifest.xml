@@ -16,7 +16,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@android:style/Theme.Holo" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -28,6 +28,31 @@
         </activity>
         <activity android:name=".ImageActivity" >
         </activity>
+        
+        <receiver android:name="com.sessionm.api.ConnectionReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" >
+                </action>
+            </intent-filter>
+        </receiver>
+        <activity
+            android:name="com.sessionm.ui.SessionMActivity"
+            android:configChanges="keyboard|orientation|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="adjustPan" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="smaba6ba56b63680cad063e987df52a71e620dbc77" />
+                <data android:scheme="sessionm"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.sessionm.ui.SessionMVideoActivity"
+            android:configChanges="keyboard|orientation|screenSize" />
+
+        <service android:name="com.sessionm.net.http.DownloadService" />
     </application>
 
 </manifest>
