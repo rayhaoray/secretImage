@@ -2,7 +2,6 @@ package com.zlei.secretimage;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -12,9 +11,10 @@ import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -26,18 +26,19 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.ortiz.touch.TouchImageView;
+import com.sessionm.api.BaseActivity;
+import com.sessionm.api.SessionM;
 import com.zlei.secretimage.Constants.Extra;
 
-public class ImageActivity extends Activity {
+public class ImageActivity extends BaseActivity {
 
     private static final String STATE_POSITION = "STATE_POSITION";
-    private int mInterval = 2000;
+    private int mInterval = 5000;
     private Handler handler;
 
     private TouchImageView imageView;
     private DisplayImageOptions options;
     private ViewPager pager;
-    private Button btn_gotit;
 
     private float zoomTimes;
     private float xCoor;
@@ -47,6 +48,7 @@ public class ImageActivity extends Activity {
     private ArrayList<String> imagesUri;
     private Runnable mStatusChecker;
     protected ImageLoader imageLoader;
+    private boolean dialogIsOn = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,6 @@ public class ImageActivity extends Activity {
             imageLoader.init(ImageLoaderConfiguration.createDefault(this));
         }
 
-        btn_gotit = (Button) this.findViewById(R.id.got_it);
         handler = new Handler();
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
@@ -133,6 +134,14 @@ public class ImageActivity extends Activity {
                     inflater.inflate(R.layout.item_pager_image, view, false);
             imageView =
                     (TouchImageView) imageLayout.findViewById(R.id.img);
+            imageView.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    onGotIt(v);
+                    return false;
+                }
+            });
+
             final ProgressBar spinner =
                     (ProgressBar) imageLayout.findViewById(R.id.loading);
 
@@ -235,9 +244,8 @@ public class ImageActivity extends Activity {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (pagerPosition < imagesUri.size() - 1) {
                                     pagerPosition++;
-                                    // reset for get new image
-                                    zoomTimes = ZOOMMAX;
-                                    startRepeatingTask();
+                                    getAction();
+                                    resetView();
                                 }
                                 else {
                                     new AlertDialog.Builder(ImageActivity.this).setMessage(
@@ -246,8 +254,7 @@ public class ImageActivity extends Activity {
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    imageLoader.stop();
-                                                    finish();
+                                                    finishView();
                                                 }
                                             }).show();
                                 }
@@ -256,53 +263,86 @@ public class ImageActivity extends Activity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                imageLoader.stop();
-                                finish();
+                                finishView();
                             }
-                        }).show();
+                        }).setCancelable(false).show();
             }
         }
     }
 
     public void onGotIt(View view) {
         stopRepeatingTask();
-        new AlertDialog.Builder(ImageActivity.this).setMessage(
-                "Correct?").setPositiveButton(
-                "Yes. Next",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (pagerPosition < imagesUri.size() - 1) {
-                            pagerPosition++;
-                            // reset for get new image
-                            zoomTimes = ZOOMMAX;
-                            startRepeatingTask();
+        if (!dialogIsOn) {
+            new AlertDialog.Builder(ImageActivity.this).setMessage(
+                    "Correct?").setPositiveButton(
+                    "Yes. Next",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (pagerPosition < imagesUri.size() - 1) {
+                                pagerPosition++;
+                                getAction();
+                                resetView();
+                            }
+                            else {
+                                new AlertDialog.Builder(ImageActivity.this).setMessage(
+                                        "Last Image!").setNeutralButton(
+                                        "Exit",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finishView();
+                                            }
+                                        }).show();
+                            }
                         }
-                        else {
-                            new AlertDialog.Builder(ImageActivity.this).setMessage(
-                                    "Last Image!").setNeutralButton(
-                                    "Exit",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            imageLoader.stop();
-                                            finish();
-                                        }
-                                    }).show();
+                    }).setNegativeButton("No. Continue",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            resumeView();
                         }
-                    }
-                }).setNegativeButton("No. Exit",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        imageLoader.stop();
-                        finish();
-                    }
-                }).show();
+                    }).setOnDismissListener(
+                    new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            dialogIsOn = false;
+                        }
+                    }).setCancelable(false).show();
+            dialogIsOn = true;
+        }
+    }
+
+    private void resetView() {
+        // reset for get new image
+        zoomTimes = ZOOMMAX;
+        startRepeatingTask();
+    }
+
+    private void resumeView() {
+        startRepeatingTask();
+    }
+
+    private void finishView() {
+        imageLoader.stop();
+        finish();
+    }
+
+    //get sessionM actions
+    private void getAction() {
+        if (pagerPosition == 1) {
+            SessionM.getInstance().logAction(
+                    "first_one");
+        }
+        if (pagerPosition == 2) {
+            SessionM.getInstance().logAction(
+                    "mission_completed");
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
+
 }

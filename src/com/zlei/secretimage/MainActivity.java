@@ -1,7 +1,6 @@
 package com.zlei.secretimage;
 
 import static com.zlei.secretimage.Constants.IMAGES;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,9 +10,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.sessionm.api.BaseActivity;
 import com.zlei.secretimage.Constants.Extra;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

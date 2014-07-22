@@ -4,6 +4,9 @@ public final class Constants {
 
     public static final String[] IMAGES = new String[] {
             // Light images
+            "https://lh6.ggpht.com/hGnzb0TzcUKDC63BIxs-x0wig5iq7SJd7F1iSRBywX3fbKyLoMDZWAsJJNxyOx9F1rUk=w300",
+            "http://www.sessionm.com/wp-content/themes/sessionm/images/m.png",
+            "https://lh4.ggpht.com/xnSLC4nMwjNT0KIyvn9ZSbzvOI3etNFcVCCF5bdGddjga2qD85sluBsa6J6G8672Ayc=w300",
             "http://c.wrzuta.pl/wm16596/a32f1a47002ab3a949afeb4f",
             "http://macprovid.vo.llnwd.net/o43/hub/media/1090/6882/01_headline_Muse.jpg",
             // Heavy images
