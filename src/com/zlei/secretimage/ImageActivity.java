@@ -49,7 +49,7 @@ public class ImageActivity extends BaseActivity {
     private Runnable mStatusChecker;
     protected ImageLoader imageLoader;
     private boolean dialogIsOn = false;
-
+    //private IBeacon iBeacon;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +60,7 @@ public class ImageActivity extends BaseActivity {
             imageLoader.init(ImageLoaderConfiguration.createDefault(this));
         }
 
+        //iBeacon = new IBeacon(this);
         handler = new Handler();
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
@@ -93,6 +94,7 @@ public class ImageActivity extends BaseActivity {
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new ImagePagerAdapter(imagesUri));
         // pager.setCurrentItem(pagerPosition);
+        //iBeacon.initialScan();
         startRepeatingTask();
     }
 
@@ -107,7 +109,19 @@ public class ImageActivity extends BaseActivity {
         imageLoader.stop();
         super.onBackPressed();
     }
+    
+    @Override
+    public void onResume(){
+        super.onResume();
+        //iBeacon.scanLeDevice(true);
+    }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+        //iBeacon.scanLeDevice(false);
+    }
+    
     private class ImagePagerAdapter extends PagerAdapter {
 
         private ArrayList<String> imageUri;
@@ -244,7 +258,6 @@ public class ImageActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (pagerPosition < imagesUri.size() - 1) {
                                     pagerPosition++;
-                                    getAction();
                                     resetView();
                                 }
                                 else {
@@ -265,7 +278,13 @@ public class ImageActivity extends BaseActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 finishView();
                             }
-                        }).setCancelable(false).show();
+                        }).setOnDismissListener(
+                        new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                getAction();
+                            }
+                        }).show();
             }
         }
     }
@@ -281,7 +300,6 @@ public class ImageActivity extends BaseActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             if (pagerPosition < imagesUri.size() - 1) {
                                 pagerPosition++;
-                                getAction();
                                 resetView();
                             }
                             else {
@@ -328,16 +346,10 @@ public class ImageActivity extends BaseActivity {
         finish();
     }
 
-    //get sessionM actions
+    // get sessionM actions
     private void getAction() {
-        if (pagerPosition == 1) {
-            SessionM.getInstance().logAction(
-                    "first_one");
-        }
-        if (pagerPosition == 2) {
-            SessionM.getInstance().logAction(
-                    "mission_completed");
-        }
+        SessionM.getInstance().logAction(
+                "daily visit");
     }
 
     @Override

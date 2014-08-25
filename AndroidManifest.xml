@@ -8,6 +8,12 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +25,10 @@
         android:theme="@android:style/Theme.Holo" >
         <meta-data
             android:name="com.sessionm.appid"
-            android:value="53407ebe33b02986cdf66c54f096cac3cefa292d" />
+            android:value="aba6ba56b63680cad063e987df52a71e620dbc77" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".MainActivity"
@@ -49,6 +58,10 @@
         <activity
             android:name="com.sessionm.ui.SessionMVideoActivity"
             android:configChanges="keyboard|orientation|screenSize" />
+
+        <service
+            android:name="com.sessionm.ble.BluetoothLeService"
+            android:enabled="true" />
     </application>
 
 </manifest>

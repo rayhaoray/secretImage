@@ -4,6 +4,7 @@ public final class Constants {
 
     public static final String[] IMAGES = new String[] {
             // Light images
+            "http://172.100.3.83/image/grass1.png",
             "https://lh6.ggpht.com/hGnzb0TzcUKDC63BIxs-x0wig5iq7SJd7F1iSRBywX3fbKyLoMDZWAsJJNxyOx9F1rUk=w300",
             "http://www.sessionm.com/wp-content/themes/sessionm/images/m.png",
             "https://lh4.ggpht.com/xnSLC4nMwjNT0KIyvn9ZSbzvOI3etNFcVCCF5bdGddjga2qD85sluBsa6J6G8672Ayc=w300",
