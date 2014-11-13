@@ -2,4 +2,5 @@
 <lint>
     <issue id="ClickableViewAccessibility" severity="ignore" />
     <issue id="NewApi" severity="ignore" />
+    <issue id="ViewHolder" severity="ignore" />
 </lint>

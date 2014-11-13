@@ -4,7 +4,8 @@ public final class Constants {
 
     public static final String[] IMAGES = new String[] {
             // Light images
-            "http://172.100.3.83/image/grass1.png",
+            "file://storage/sdcard0/DCIM/Camera/001.jpg",
+            //"http://172.100.3.83/image/grass1.png",
             "https://lh6.ggpht.com/hGnzb0TzcUKDC63BIxs-x0wig5iq7SJd7F1iSRBywX3fbKyLoMDZWAsJJNxyOx9F1rUk=w300",
             "http://www.sessionm.com/wp-content/themes/sessionm/images/m.png",
             "https://lh4.ggpht.com/xnSLC4nMwjNT0KIyvn9ZSbzvOI3etNFcVCCF5bdGddjga2qD85sluBsa6J6G8672Ayc=w300",
@@ -19,7 +20,6 @@ public final class Constants {
             "http://4.bp.blogspot.com/-LEvwF87bbyU/Uicaskm-g6I/AAAAAAAAZ2c/V-WZZAvFg5I/s800/Pesto+Guacamole+500w+0268.jpg", // Image with "Mark has been invalidated" problem
             "https://www.eff.org/sites/default/files/chrome150_0.jpg", // Image from HTTPS
             "http://img001.us.expono.com/100001/100001-1bc30-2d736f_m.jpg", // EXIF
-            "file://mnt/sdcard/DCIM/100ANDRO/DSC_0533.jpg",
     };
 
     private Constants() {

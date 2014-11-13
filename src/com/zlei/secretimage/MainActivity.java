@@ -2,6 +2,8 @@ package com.zlei.secretimage;
 
 import static com.zlei.secretimage.Constants.IMAGES;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.util.Locale;
 
 import android.app.Fragment;
@@ -10,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -31,7 +32,6 @@ import com.sessionm.api.BaseActivity;
 import com.sessionm.api.SessionM;
 import com.sessionm.api.SessionM.ActivityType;
 import com.zlei.secretimage.Constants.Extra;
-import com.zlei.secretimage.SessionMTransaction.SessionMTransactionListener;
 
 public class MainActivity extends BaseActivity {
 
@@ -42,11 +42,13 @@ public class MainActivity extends BaseActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mListTitles;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //main app
         this.getImagePath();
         mTitle = mDrawerTitle = getTitle();
         mListTitles = getResources().getStringArray(R.array.lists_array);
@@ -86,46 +88,12 @@ public class MainActivity extends BaseActivity {
                     }
                 };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        
 
         if (savedInstanceState == null) {
             selectItem(0);
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SessionMTransaction txn = new SessionMTransaction(this, "aba6ba56b63680cad063e987df52a71e620dbc77");
-        txn.start();
-        SessionMTransactionListener listener = new SessionMTransactionListener() {
-            @Override
-            public void onSuccess(SessionMTransaction txn) {
-                Log.i("success ", "yay!");
-            }
-
-            @Override
-            public void onError(SessionMTransaction txn, int statusCode, Throwable error) {
-                Log.i("fail ", String.format("boo! %s %d", error, statusCode));
-            }
-        };
-        txn.setListener(listener);
-    }
-    
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-    
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
     public void onStartClick(View view) {
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra(Extra.IMAGES, IMAGES);
@@ -133,7 +101,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getImagePath() {
-        String path = Environment.getExternalStorageDirectory().toString();
+        //String path = Environment.getExternalStorageDirectory().toString();
         String[] projection = { MediaStore.Images.Media.DATA };
         for (String str : projection) {
             Log.d("path: ", str + "\n");
@@ -212,9 +180,6 @@ public class MainActivity extends BaseActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
     public static class ListFragment extends Fragment {
         public static final String ARG_NUMBER = "arg_number";
 
@@ -230,6 +195,8 @@ public class MainActivity extends BaseActivity {
                     container, false);
             switch (i) {
             case 1:
+                CookieManager cookieManager = new CookieManager();
+                CookieHandler.setDefault(cookieManager);
                 SessionM.getInstance().presentActivity(ActivityType.PORTAL);
                 break;
             case 2:
@@ -271,7 +238,7 @@ public class MainActivity extends BaseActivity {
             TextView textView = (TextView) rowView.findViewById(R.id.list_text);
             ImageView imageView = (ImageView) rowView.findViewById(R.id.list_icon);
             textView.setText(objects[position]);
-            String s = objects[position];
+            //String s = objects[position];
 
             imageView.setImageResource(R.drawable.ic_launcher);
             return rowView;

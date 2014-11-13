@@ -1,6 +1,7 @@
 package com.zlei.secretimage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -30,6 +31,8 @@ import com.sessionm.api.BaseActivity;
 import com.sessionm.api.SessionM;
 import com.zlei.secretimage.Constants.Extra;
 
+import junit.framework.Assert;
+
 public class ImageActivity extends BaseActivity {
 
     private static final String STATE_POSITION = "STATE_POSITION";
@@ -49,18 +52,18 @@ public class ImageActivity extends BaseActivity {
     private Runnable mStatusChecker;
     protected ImageLoader imageLoader;
     private boolean dialogIsOn = false;
-    //private IBeacon iBeacon;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_image_pager);
+        if(getActionBar() != null)
+            getActionBar().hide();
 
         imageLoader = ImageLoader.getInstance();
         if (!imageLoader.isInited()) {
             imageLoader.init(ImageLoaderConfiguration.createDefault(this));
         }
 
-        //iBeacon = new IBeacon(this);
         handler = new Handler();
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
@@ -70,9 +73,7 @@ public class ImageActivity extends BaseActivity {
         }
 
         // int pagerPosition = bundle.getInt(Extra.IMAGE_POSITION, 0);
-        for (String uri : imageUrls) {
-            imagesUri.add(uri);
-        }
+        Collections.addAll(imagesUri, imageUrls);
         pagerPosition = 0;
 
         if (savedInstanceState != null) {
@@ -94,7 +95,6 @@ public class ImageActivity extends BaseActivity {
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new ImagePagerAdapter(imagesUri));
         // pager.setCurrentItem(pagerPosition);
-        //iBeacon.initialScan();
         startRepeatingTask();
     }
 
@@ -113,13 +113,11 @@ public class ImageActivity extends BaseActivity {
     @Override
     public void onResume(){
         super.onResume();
-        //iBeacon.scanLeDevice(true);
     }
 
     @Override
     public void onPause(){
         super.onPause();
-        //iBeacon.scanLeDevice(false);
     }
     
     private class ImagePagerAdapter extends PagerAdapter {
@@ -282,7 +280,6 @@ public class ImageActivity extends BaseActivity {
                         new DialogInterface.OnDismissListener() {
                             @Override
                             public void onDismiss(DialogInterface dialog) {
-                                getAction();
                             }
                         }).show();
             }
