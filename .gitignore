@@ -1,0 +1,21 @@
+# Created by .gitignore support plugin (hsz.mobi)
+
+bin
+.gradle
+.idea
+.settings
+build
+gen
+hooks
+info
+index
+.classpath
+description
+gradlew.bat
+.project
+config
+packed-refs
+proguard-project.txt
+secretImage.iml
+lint.xml
+HEAD
