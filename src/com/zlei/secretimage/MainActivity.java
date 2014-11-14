@@ -147,6 +147,18 @@ public class MainActivity extends BaseActivity {
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getFragmentManager();
+        switch (position) {
+            case 0:
+                fragment = new StartFragment();
+                break;
+            case 1:
+                fragment = new GridFragment();
+                break;
+            case 2:
+                SessionM.getInstance().presentActivity(ActivityType.PORTAL);
+                break;
+        }
+
         fragmentManager.beginTransaction().replace(R.id.main_content, fragment).commit();
 
         // update selected item and title, then close the drawer
@@ -191,28 +203,9 @@ public class MainActivity extends BaseActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             int i = getArguments().getInt(ARG_NUMBER);
-            View rootView = inflater.inflate(R.layout.fragment_home,
+            View rootView = inflater.inflate(R.layout.activity_main,
                     container, false);
-            switch (i) {
-            case 1:
-                CookieManager cookieManager = new CookieManager();
-                CookieHandler.setDefault(cookieManager);
-                SessionM.getInstance().presentActivity(ActivityType.PORTAL);
-                break;
-            case 2:
-                rootView = inflater.inflate(R.layout.fragment_image,
-                        container, false);
-                String image = getResources().getStringArray(
-                        R.array.lists_array)[i];
-                int imageId = getResources().getIdentifier(
-                        image.toLowerCase(Locale.getDefault()),
-                        "drawable", getActivity().getPackageName());
-                ((ImageView) rootView.findViewById(R.id.image)).setImageResource(imageId);
-                getActivity().setTitle(image);
-                break;
-            default:
-                break;
-            }
+
             return rootView;
         }
     }

@@ -36,7 +36,7 @@ import junit.framework.Assert;
 public class ImageActivity extends BaseActivity {
 
     private static final String STATE_POSITION = "STATE_POSITION";
-    private int mInterval = 5000;
+    private int mInterval = 1000;
     private Handler handler;
 
     private TouchImageView imageView;
@@ -68,12 +68,18 @@ public class ImageActivity extends BaseActivity {
         Bundle bundle = getIntent().getExtras();
         String[] imageUrls = new String[100];
         imagesUri = new ArrayList<String>();
+
         if (bundle != null) {
             imageUrls = bundle.getStringArray(Extra.IMAGES);
         }
 
-        // int pagerPosition = bundle.getInt(Extra.IMAGE_POSITION, 0);
-        Collections.addAll(imagesUri, imageUrls);
+
+        int pagerPosition = bundle.getInt(Extra.IMAGE_POSITION, 0);
+        if(!GridFragment.getSelectedUrls().isEmpty())
+            imagesUri = GridFragment.getSelectedUrls();
+        else
+            Collections.addAll(imagesUri, imageUrls);
+
         pagerPosition = 0;
 
         if (savedInstanceState != null) {
